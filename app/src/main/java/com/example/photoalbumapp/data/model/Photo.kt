@@ -62,11 +62,26 @@ class Photo() : Parcelable {
     }
 
     override fun describeContents(): Int {
-        TODO("Not yet implemented")
+
+        return 0
     }
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
-        TODO("Not yet implemented")
+        dest!!.writeString(id)
+        dest!!.writeString(user_id)
+        dest!!.writeString(created_at)
+        dest!!.writeString(content_type)
+        dest!!.writeString(download_url)
+        dest!!.writeString(filename)
+        dest!!.writeString(guessed_taken_at)
+        dest!!.writeString(md5sum)
+        dest!!.writeString(media_type)
+        dest!!.writeString(thumbnail_url)
+        dest!!.writeString(taken_at)
+        dest.writeString(video)
+        dest!!.writeLong(resx)
+        dest!!.writeLong(resy)
+        dest!!.writeLong(size)
     }
 
     companion object CREATOR : Parcelable.Creator<Photo> {

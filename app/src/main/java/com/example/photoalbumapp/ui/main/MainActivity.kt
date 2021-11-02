@@ -75,9 +75,6 @@ class MainActivity : AppCompatActivity() {
                 .commitAllowingStateLoss()
         } else {
             detailFragment = DetailFragment.newInstance(item)
-//            val bundle = Bundle()
-//            bundle.putParcelable("param1",item)
-//            detailFragment.arguments = bundle
             supportFragmentManager.beginTransaction()
                 .add(R.id.container, detailFragment, DETAIL_FRAGMENT_TAG)
                 .commitAllowingStateLoss()
