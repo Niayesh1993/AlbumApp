@@ -41,7 +41,7 @@ class RecyclerAdapter:
         override fun bind(t: Photo) {
 
             t.getPhoto()?.let { it1 ->
-                ImageLoader.loadImageWithCircularCrop(
+                ImageLoader.loadImageWithMinimumDimensionsMode(
                     itemView.context,
                     it1,
                     itemView.item_photo

@@ -3,13 +3,11 @@ package com.example.photoalbumapp.ui.main
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import com.example.choco.utils.viewbinding.viewBindings
 import com.example.photoalbumapp.R
 import com.example.photoalbumapp.data.model.Photo
 import com.example.photoalbumapp.databinding.FragmentDetailBinding
 import com.example.photoalbumapp.utils.ImageLoader
-import com.example.photoalbumapp.utils.observeUiState
 import dagger.hilt.android.AndroidEntryPoint
 
 private const val ARG_PARAM1 = "param1"
@@ -32,11 +30,11 @@ class DetailFragment : Fragment(R.layout.fragment_detail) {
         }
 
         with(binding) {
-            txtCreatedAt.text = photo?.getDate()
+            txtCreatedAt.text = "Created at: "+photo?.getDate()
 
             photo?.getPhoto()?.let { it1 ->
                 activity?.let {
-                    ImageLoader.loadImageWithCircularCrop(
+                    ImageLoader.loadImageWithBoundingBoxMode(
                         it,
                         it1,
                         imgFullScreen

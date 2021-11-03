@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun showDetailFragment(item: Photo) {
+    private fun showDetailFragment(item: Photo) {
         val detailFragment: DetailFragment
         binding.recycler.visibility = View.GONE
         binding.appbarLayout.visibility = View.GONE

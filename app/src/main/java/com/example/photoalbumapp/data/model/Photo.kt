@@ -62,7 +62,6 @@ class Photo() : Parcelable {
     }
 
     override fun describeContents(): Int {
-
         return 0
     }
 
