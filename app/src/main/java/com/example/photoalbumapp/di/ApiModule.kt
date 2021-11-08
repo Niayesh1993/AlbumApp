@@ -1,5 +1,7 @@
 package com.example.photoalbumapp.di
 
+import android.content.Context
+import android.util.Log
 import com.example.photoalbumapp.data.api.API_BASE_URL
 import com.example.photoalbumapp.data.api.ApiService
 import com.example.photoalbumapp.data.api.StatusCode.SUCCESS
@@ -14,8 +16,15 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
+import java.lang.Exception
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+import okhttp3.CacheControl
+import okhttp3.Interceptor
+
+import android.net.ConnectivityManager
+import com.example.photoalbumapp.utils.Constants
 
 
 @InstallIn(SingletonComponent::class)
@@ -51,6 +60,9 @@ class ApiModule {
             .addInterceptor(interceptor)
             .addInterceptor(emptyBodyInterceptor)
             .addInterceptor(authInjection)
+            .addInterceptor(provideOfflineCacheInterceptor())
+            .addNetworkInterceptor(provideCacheInterceptor())
+            .cache(provideCache())
             .retryOnConnectionFailure(true)
             .followRedirects(false)
             .followSslRedirects(false)
@@ -92,6 +104,65 @@ class ApiModule {
                 .build()
         }
     }
+
+    @Singleton
+    @Provides
+    fun provideCache(): Cache? {
+        var cache: Cache? = null
+        try {
+            cache = Cache(File(PhotoAlbumApp.getContext().cacheDir, "http-cache"), 20 * 1024 * 1024) // 10 MB
+        } catch (e: Exception) {
+            Log.e("Cache", "Could not create Cache!")
+        }
+        return cache
+    }
+
+    @Singleton
+    @Provides
+    fun provideCacheInterceptor(): Interceptor {
+        return Interceptor { chain: Interceptor.Chain ->
+            val response = chain.proceed(chain.request())
+            val cacheControl: CacheControl
+            cacheControl = if (isNetworkConnected(PhotoAlbumApp.getContext())) {
+                CacheControl.Builder().maxAge(0, TimeUnit.SECONDS).build()
+            } else {
+                CacheControl.Builder()
+                    .maxStale(7, TimeUnit.DAYS)
+                    .build()
+            }
+            response.newBuilder()
+                .removeHeader(Constants().HEADER_PRAGMA)
+                .removeHeader(Constants().HEADER_CACHE_CONTROL)
+                .header(Constants().HEADER_CACHE_CONTROL, cacheControl.toString())
+                .build()
+        }
+    }
+
+    @Singleton
+    @Provides
+    fun provideOfflineCacheInterceptor(): Interceptor {
+        return Interceptor { chain: Interceptor.Chain ->
+            var request = chain.request()
+            if (isNetworkConnected(PhotoAlbumApp.getContext())) {
+                val cacheControl = CacheControl.Builder()
+                    .maxStale(7, TimeUnit.DAYS)
+                    .build()
+                request = request.newBuilder()
+                    .removeHeader(Constants().HEADER_PRAGMA)
+                    .removeHeader(Constants().HEADER_CACHE_CONTROL)
+                    .cacheControl(cacheControl)
+                    .build()
+            }
+            chain.proceed(request)
+        }
+    }
+
+    fun isNetworkConnected(context: Context): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val info = cm.activeNetworkInfo
+        return info != null && info.isConnected
+    }
+
 
     companion object {
         const val TIMEOUT_SECONDS: Long = 100

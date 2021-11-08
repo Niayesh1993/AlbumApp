@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.example.photoalbumapp.R
+import com.example.photoalbumapp.data.api.stringRes
 import com.example.photoalbumapp.ui.widget.MaterialSnackBar
 
 fun AppCompatActivity.observeUiState(uiStateModel: LiveData<UiStateModel>) {
@@ -46,7 +47,7 @@ fun <T> MutableLiveData<UiStateModel>.handleApiError(response: ApiResult<T>) {
     }
 
     if (response is ApiResult.NetworkError) {
-        update(toast = Event(R.string.no_internet_access.toString()))
+        update(toast = Event(R.string.no_internet_access.stringRes()))
     }
 }
 

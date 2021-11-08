@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.photoalbumapp.data.api.StatusCode.NOT_FOUND
 import com.example.photoalbumapp.data.model.Photo
 import com.example.photoalbumapp.data.repository.main.MainRepositoryImpl
+import com.example.photoalbumapp.di.PhotoAlbumApp
 import com.example.photoalbumapp.utils.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -52,6 +53,10 @@ class MainViewModel @Inject constructor(
                 _uiState.handleApiError(response)
             }
         }
+    }
+
+    fun Int.stringRes(): String {
+        return PhotoAlbumApp.getContext().resources.getString(this)
     }
 
 }
